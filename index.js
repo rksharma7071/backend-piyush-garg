@@ -9,7 +9,7 @@ const myServer = http.createServer((req, res) => {
   const timestamp = Date.now();
   const formattedDate = new Date(timestamp).toLocaleString();
 
-  const log = `${formattedDate}: ${req.url} : New request received\n`;
+  const log = `${formattedDate}: ${req.method} ${req.url} : New request received\n`;
 
   const myUrl = url.parse(req.url ,true);
   console.log(myUrl);
@@ -20,8 +20,20 @@ const myServer = http.createServer((req, res) => {
         res.end("Home Page");
         break;
       case '/about':
-        const username = myUrl.query.username;
+        const username = myUrl.query.username || "";
         res.end(`Hi ${username}`);
+        break;
+      case '/search':
+        const search = myUrl.query.search || "";
+        res.end(`Here is you search query: ${search}`);
+        break;
+      case '/signup':
+        if(req.method == "GET"){
+          res.end("This is a signup form");
+        }
+        else if(req.method == "POST"){
+          res.end("Success");
+        }
         break;
       default:
         res.end("404 Page Not Found!");
