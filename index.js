@@ -1,44 +1,37 @@
-const http = require("http");
-const fs = require('fs');
-const url = require("url");
+const express = require('express');
+const users = require('./users.json');
 
+const app = express();
+const PORT = 8000;
 
-const myServer = http.createServer((req, res) => {
-
-  if(req.url == "/favicon.ico") return res.end();
-  const timestamp = Date.now();
-  const formattedDate = new Date(timestamp).toLocaleString();
-
-  const log = `${formattedDate}: ${req.method} ${req.url} : New request received\n`;
-
-  const myUrl = url.parse(req.url ,true);
-  console.log(myUrl);
-
-  fs.appendFile('log.txt', log, (err, data) => {
-    switch (myUrl.pathname) {
-      case '/':
-        res.end("Home Page");
-        break;
-      case '/about':
-        const username = myUrl.query.username || "";
-        res.end(`Hi ${username}`);
-        break;
-      case '/search':
-        const search = myUrl.query.search || "";
-        res.end(`Here is you search query: ${search}`);
-        break;
-      case '/signup':
-        if(req.method == "GET"){
-          res.end("This is a signup form");
-        }
-        else if(req.method == "POST"){
-          res.end("Success");
-        }
-        break;
-      default:
-        res.end("404 Page Not Found!");
-    }
-  })
+app.get('/api/users', (req, res) => {
+  res.json(users);
+})
+app.get('/api/users/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const user = users.find((user) => user.id === id);
+  res.json(user);
 })
 
-myServer.listen(8000, () => console.log("Server Started..."));
+app.post('/api/users', (req, res) => {
+  // TODO : Create new user
+  return res.json({ status: "pending" });
+})
+
+app.patch('/api/users/:id', (req, res) => {
+  // TODO : Edit the user with id 
+  return res.json({ status: "pending" });
+})
+app.delete('/api/users/:id', (req, res) => {
+  // TODO : Delete the user with id 
+  return res.json({ status: "pending" });
+})
+
+app.get('/users', (req, res) => {
+  const html = `
+    <ul>${users.map(user => `<li>${user.first_name}</li>`).join("")}.jon</ul>
+  `;
+  res.send(html);
+})
+
+app.listen(PORT, () => console.log("Server Started..."));
