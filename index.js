@@ -1,31 +1,43 @@
 const express = require('express');
+const fs = require('fs');
 const users = require('./users.json');
 
 const app = express();
 const PORT = 8000;
 
+// Middleware plugin
+app.use(express.urlencoded({ extended: false }));
+
 app.get('/api/users', (req, res) => {
   res.json(users);
-})
-app.get('/api/users/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const user = users.find((user) => user.id === id);
-  res.json(user);
 })
 
 app.post('/api/users', (req, res) => {
   // TODO : Create new user
-  return res.json({ status: "pending" });
+  const body = req.body;
+  console.log("Body", body);
+  users.push({ ...body, id: users.length + 1 });
+  fs.writeFile('./users.json', JSON.stringify(users), (err, data) => {
+    return res.json({ status: "success", id: users.length });
+  })
 })
 
-app.patch('/api/users/:id', (req, res) => {
-  // TODO : Edit the user with id 
-  return res.json({ status: "pending" });
-})
-app.delete('/api/users/:id', (req, res) => {
-  // TODO : Delete the user with id 
-  return res.json({ status: "pending" });
-})
+app.route("/api/users/:id")
+  .get((req, res) => {
+    // Get the user with ID
+    const id = Number(req.params.id);
+    const user = users.find((user) => user.id === id);
+    res.json(user);
+  })
+  .patch((req, res) => {
+    // Edit form with id
+    return res.json({ status: "pending" });
+  })
+  .delete((req, res) => {
+    // Delete form with id
+    return res.json({ status: "pending" });
+  });
+
 
 app.get('/users', (req, res) => {
   const html = `
